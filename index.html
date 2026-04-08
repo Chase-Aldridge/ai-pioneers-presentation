@@ -1977,35 +1977,33 @@
       if (event.fragment.classList.contains('card-enter')) {
         event.fragment.classList.add('visible');
       }
-      // Jax age flip-up animation with eased timing
+      // Jax age flip-up animation: sequential count 1-17, eased timing
       if (event.fragment.id === 'jax-age-reveal') {
         event.fragment.classList.add('visible');
         const numEl = document.getElementById('jax-age-num');
         const target = 17;
-        // Delays in ms: start slow, speed up in middle, dramatically slow at end
-        const delays = [
-          120, 100, 80, 60, 45, 35, 30, 25, 25, 25,  // ramp up
-          25, 25, 25, 25, 30, 35, 45, 60,             // fast middle
-          120, 200, 400                                 // dramatic slowdown
-        ];
-        // Last 3 values converge toward target
-        const values = delays.map((_, i) => {
-          if (i === delays.length - 3) return Math.floor(Math.random() * 25) + 1;
-          if (i === delays.length - 2) return target + (Math.random() > 0.5 ? 1 : -1);
-          if (i === delays.length - 1) return target;
-          return Math.floor(Math.random() * 30) + 1;
-        });
-        let step = 0;
-        function flipNext() {
-          numEl.textContent = values[step];
-          step++;
-          if (step < delays.length) {
-            setTimeout(flipNext, delays[step]);
+        let current = 0;
+        function getDelay(n) {
+          // Start slow, speed up in middle, dramatically slow on last 3
+          if (n <= 2) return 120;
+          if (n <= 5) return 70;
+          if (n <= 12) return 35;
+          if (n === 13) return 60;
+          if (n === 14) return 100;
+          if (n === 15) return 180;
+          if (n === 16) return 320;
+          return 500;
+        }
+        function tick() {
+          current++;
+          numEl.textContent = current;
+          if (current < target) {
+            setTimeout(tick, getDelay(current));
           } else {
             setTimeout(() => { numEl.classList.add('dancing'); }, 300);
           }
         }
-        setTimeout(flipNext, delays[0]);
+        setTimeout(tick, getDelay(0));
       }
     });
 
