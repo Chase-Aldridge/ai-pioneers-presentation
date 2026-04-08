@@ -1977,23 +1977,35 @@
       if (event.fragment.classList.contains('card-enter')) {
         event.fragment.classList.add('visible');
       }
-      // Jax age flip-up animation
+      // Jax age flip-up animation with eased timing
       if (event.fragment.id === 'jax-age-reveal') {
         event.fragment.classList.add('visible');
         const numEl = document.getElementById('jax-age-num');
         const target = 17;
-        let frame = 0;
-        const totalFrames = 24;
-        const interval = setInterval(() => {
-          frame++;
-          if (frame < totalFrames) {
-            numEl.textContent = Math.floor(Math.random() * 30) + 1;
+        // Delays in ms: start slow, speed up in middle, dramatically slow at end
+        const delays = [
+          120, 100, 80, 60, 45, 35, 30, 25, 25, 25,  // ramp up
+          25, 25, 25, 25, 30, 35, 45, 60,             // fast middle
+          120, 200, 400                                 // dramatic slowdown
+        ];
+        // Last 3 values converge toward target
+        const values = delays.map((_, i) => {
+          if (i === delays.length - 3) return Math.floor(Math.random() * 25) + 1;
+          if (i === delays.length - 2) return target + (Math.random() > 0.5 ? 1 : -1);
+          if (i === delays.length - 1) return target;
+          return Math.floor(Math.random() * 30) + 1;
+        });
+        let step = 0;
+        function flipNext() {
+          numEl.textContent = values[step];
+          step++;
+          if (step < delays.length) {
+            setTimeout(flipNext, delays[step]);
           } else {
-            numEl.textContent = target;
-            clearInterval(interval);
-            setTimeout(() => { numEl.classList.add('dancing'); }, 200);
+            setTimeout(() => { numEl.classList.add('dancing'); }, 300);
           }
-        }, 60);
+        }
+        setTimeout(flipNext, delays[0]);
       }
     });
 
