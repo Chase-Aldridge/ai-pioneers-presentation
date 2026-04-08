@@ -745,7 +745,7 @@
         <aside class="notes">
           So two angles tonight. First is personal scale. I run a personal AI system called Jax. Over 45 autonomous jobs across 4 biological body systems. Email triage, revenue analysis, vault cleanup, relationship tracking. All governed by hooks that fire every single time the AI does anything.
 
-          Second is enterprise scale. I built a 17-document AI compliance framework for an enterprise client. Their VP of GRC brought me in to build governance that could actually pass audit. Same hook principles, same audit trail concepts, just with regulatory requirements layered on top. Tonight I'll show you how both work.
+          Second is enterprise scale. I built a 17-document AI compliance framework for an enterprise client -- their VP of GRC brought me in because they had AI systems handling sensitive data, including minors, and no standardized compliance process. Three governance policies, two risk assessment tools, and twelve compliance templates covering everything from EU AI Act classification to bias monitoring to children's data protection impact assessments. I also created a four-level safety classification system and a risk-tiered documentation matrix so higher-risk systems get more scrutiny. Tonight I'll show you how both angles work.
         </aside>
       </section>
 
@@ -798,7 +798,9 @@
           </div>
         </div>
         <aside class="notes">
-          Let me start with the uncomfortable truth. 95% of AI projects fail. And usually it's not because the AI itself is bad. It's because nobody built guardrails. I built governance for a company where the compliance lead couldn't get a straight answer from any LLM provider about whether image analysis would process biometric data. Even seasoned compliance pros don't know what guardrails look like yet.
+          Let me start with the uncomfortable truth. 95% of AI projects fail. And usually it's not because the AI itself is bad. It's because nobody built guardrails.
+
+          Here's a real example. I was brought in to build AI systems for an enterprise client. First thing the compliance lead asks: "Are we processing biometric data?" Turns out none of the major LLM providers -- Google, Anthropic, OpenAI -- will confirm in writing that image analysis through their APIs won't constitute biometric data processing. They push that liability entirely onto the developer. So now you've got a VP of Compliance who can't get a straight answer from any vendor, and you've got an AI system that needs to analyze photos -- including photos of minors. Without a governance framework, that project is dead on arrival. Or worse, it launches and you get hit with a fine like Imgur did for failing to protect children's privacy.
 
           These are real incidents that happen when AI operates without governance. Deleting production files. Sending emails with wrong pricing. Pushing secrets to public repos. Every single one of these is preventable. Let me show you how.
         </aside>
@@ -838,7 +840,9 @@
 
           External Comms Gate catches anything going outside the system. Emails, Slack messages, invoices. I see the content before it sends. No AI sending emails on my behalf without my review.
 
-          Pre-Deploy Validation runs a checklist before any deployment. TypeScript compiles? Env vars set? Git clean? This catches the stupid mistakes before they hit production. In the enterprise version I built, this maps to a formal pre-launch checklist requiring three-party sign-off -- engineer, compliance officer, and business owner -- before any AI system goes live.
+          Pre-Deploy Validation runs a checklist before any deployment. TypeScript compiles? Env vars set? Git clean? This catches the stupid mistakes before they hit production.
+
+          At enterprise scale, this same concept becomes a formal pre-launch checklist. I built one where the system literally will not go live until three people sign off: the engineer who built it, the compliance officer who reviewed the risk documentation, and the head of IT who verified infrastructure security. No single person can bypass it. And the documentation requirements scale with risk. I built a four-tier risk classification: Tier 1 is minimal risk, internal only, needs 3 documents. Tier 2 involves personal data, needs 6 to 8. Tier 3 -- employment context or children's data -- needs 11 to 12 documents. Tier 4, high-risk under the EU AI Act, needs all 12. The system routes you to the right paperwork automatically based on a decision tree.
 
           The key insight is these don't block. They inject context. The AI still makes the decision, but it makes a better decision because it has more information.
         </aside>
@@ -893,7 +897,9 @@
 
           Budget enforcement is huge. I track daily API spend against soft and hard limits. The AI literally can't blow through my API budget without hitting a wall.
 
-          Data boundaries define what the AI can read versus write. My vault syncs are read-only. External API calls get confirmation gates. And we have an edit-over-delete policy. The AI can't just delete things. It has to update them. Deletions require my explicit approval. Watch out for audit trail retention too -- one platform I used had a 10K row execution log limit, so your audit trail silently vanishes unless you build a hybrid export to long-term storage.
+          Data boundaries define what the AI can read versus write. My vault syncs are read-only. External API calls get confirmation gates. And we have an edit-over-delete policy. The AI can't just delete things. It has to update them. Deletions require my explicit approval.
+
+          Here's a real gotcha from enterprise work: audit trail retention. The automation platform we used had a 10,000-row execution log limit. Once you hit that, old logs just disappear. The compliance officer flagged this immediately -- if regulators ask for an audit trail three years from now, you can't say "sorry, the platform pruned it." So we built a hybrid: operational logs stay in the platform for day-to-day use, but every compliance-critical decision -- every AI output, every classification, every approval -- gets exported to a separate audit table with permanent retention. That's one of the 12 compliance templates I built: a dedicated audit trail specification that defines exactly what gets logged, where it's stored, and how long it's kept.
         </aside>
       </section>
 
@@ -937,7 +943,9 @@
 
           When a sub-agent finishes a task, the stop hook automatically extracts the key results from its transcript and logs them to what I call the hive mind database. So I always know what every agent did and why.
 
-          Then there's the audit layer. Session summaries get generated. Usage reports track costs. And there's continuous state extraction that runs every 5th message to maintain awareness of what's happening. In the enterprise framework I built, this maps to bias monitoring and a human oversight protocol -- continuous checks that the AI's outputs aren't drifting from expected behavior, especially when it's processing sensitive data.
+          Then there's the audit layer. Session summaries get generated. Usage reports track costs. And there's continuous state extraction that runs every 5th message to maintain awareness of what's happening.
+
+          In the enterprise compliance framework, I built two dedicated templates for this. One is a bias monitoring plan -- it defines automated alerts when the AI's reject rates drift beyond thresholds, weekly reports sent to the compliance team, and quarterly comprehensive reviews. If the AI starts rejecting one demographic's submissions at a higher rate, the system catches it before a human would notice. The other is a human oversight protocol -- it specifies who has override authority, what training they need, and emergency stop procedures that require dual sign-off from both the engineer and the compliance officer. You can't just pull the plug unilaterally.
 
           The hive mind log you see here is a real excerpt. I can see exactly when agents spawn, what they find, what they cost, and what they change. You can't govern what you can't observe.
         </aside>
@@ -980,9 +988,11 @@
         <aside class="notes">
           The fourth layer is human-in-the-loop. And I want to frame this correctly. The goal is NOT to slow AI down. It's to build trust so you can give it MORE autonomy over time.
 
-          Think of permission modes as a trust dial. When I first set up a new capability, I start tight. Every action gets confirmed. As the AI proves reliable, I loosen it. Some things run fully autonomous now because they've earned that trust over months. I formalized this into four safety levels -- from Assistive, where AI just suggests, up to Determinative, where it makes the call.
+          Think of permission modes as a trust dial. When I first set up a new capability, I start tight. Every action gets confirmed. As the AI proves reliable, I loosen it. Some things run fully autonomous now because they've earned that trust over months.
 
-          But there are certain things that never go fully autonomous. External communications. Deployments. Anything that touches money. Those always have a human checkpoint. Not because the AI is bad at them. But because the cost of a mistake is too high. When the AI processes sensitive personal data involving minors, guardians can see the decision history, request human review, or opt out entirely. That dial stays locked.
+          I formalized this into four safety levels for the enterprise framework. TSL-1, Assistive: the AI provides information to staff only, no impact on end users. TSL-2, Gatekeeping: the AI makes pass/fail decisions on content -- like whether a photo meets submission guidelines -- but the person can retry easily. TSL-3, Evaluative: the AI scores or ranks people, which is where things get serious. TSL-4, Determinative: the AI makes decisions that directly affect someone's opportunities. Each level has proportional governance requirements. A TSL-1 chatbot needs maybe 3 compliance documents. A TSL-3 ranking system needs all 12.
+
+          But there are certain things that never go fully autonomous. External communications. Deployments. Anything that touches money. Those always have a human checkpoint. Not because the AI is bad at them. But because the cost of a mistake is too high. When you're dealing with minors' data, the compliance bar gets even higher. I built a children's data DPIA that specifies three rights: guardians can see the AI's full decision history on their child's profile, they can request human review of any automated decision, and they can opt out of AI processing entirely for a manual-only workflow. That dial stays locked.
         </aside>
       </section>
 
@@ -1019,7 +1029,9 @@
         <aside class="notes">
           These are real outputs from my system. Every day I see these.
 
-          A force push to main? High risk. The hook fires and makes me confirm. An email to a client? The external comms gate shows me the content before it sends. Budget tracking tells me exactly how much I've spent. And if my AI tries to commit from a directory with sensitive data, it gets blocked. In the enterprise version, I built a pre-launch checklist that literally blocks deployment until the engineer, the compliance officer, and the business owner all sign off. No single person can push an AI system live.
+          A force push to main? High risk. The hook fires and makes me confirm. An email to a client? The external comms gate shows me the content before it sends. Budget tracking tells me exactly how much I've spent. And if my AI tries to commit from a directory with sensitive data, it gets blocked.
+
+          At the enterprise level, the equivalent is a pre-launch checklist I built as one of the 12 compliance templates. Before any AI system touches real data, it goes through a sign-off process. Has the EU AI Act classification rationale been documented? Has the data protection impact assessment been completed? Is the audit trail specification locked? Is bias monitoring live? Is the transparency and disclosure plan in place -- meaning users actually know AI is involved? Has the vendor assessment cleared? All of those have to be checked off, and three people -- engineer, compliance officer, and IT lead -- have to sign before the system goes live. When we ran the first AI system through this checklist, it blocked three deployment attempts before everything was actually green. That's the system working.
 
           This is the key point I want you to take away. Governance isn't a document on a shared drive. It's not a policy that people read once and forget. It's running code that fires automatically every single time.
         </aside>
@@ -1059,7 +1071,9 @@
 
           Third, trust is earned. Start with tight permissions. Loosen them over time as the AI proves it can handle more autonomy. Permission modes are the dial you turn.
 
-          These principles apply at any scale. Solo practitioner, small team, enterprise. The mechanics change, the principles don't. I took the same governance I showed you today -- hooks, observation, trust levels -- and scaled it into a 17-document, 209-page compliance framework for a company facing the EU AI Act. Same principles, different scale.
+          These principles apply at any scale. Solo practitioner, small team, enterprise. The mechanics change, the principles don't.
+
+          I took the same governance I showed you today and scaled it into a 17-document compliance framework for a company facing the EU AI Act deadline in August 2026. Three governance policies that get reviewed annually. Two assessment tools -- an intake form and a risk classification decision tree. And 12 compliance templates that route automatically based on risk tier. The framework covers everything from DPIA and fundamental rights assessments to vendor governance and ongoing monitoring specifications. The key design principle was proportionality -- a low-risk internal chatbot doesn't need the same paperwork as a system that processes children's photos. The risk tier determines exactly which documents are required, which are recommended, and which don't apply. That's how you make governance scalable instead of bureaucratic.
         </aside>
       </section>
 
