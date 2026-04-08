@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Governance in Practice | Chase Aldridge | AI Pioneers Club</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ======================================================
+       VARIABLES & RESET - Blueprint Theme
+       ====================================================== */
+    :root {
+      --bg: #0a1628;
+      --bg-lighter: #0e1e38;
+      --bg-card: rgba(100,200,255,0.04);
+      --bg-card-border: rgba(100,200,255,0.08);
+      --accent: #00d4aa;
+      --accent2: #0099ff;
+      --accent-warm: #f0c040;
+      --accent-glow: rgba(0,212,170,0.3);
+      --accent-glow-strong: rgba(0,212,170,0.6);
+      --text: #e8edf5;
+      --text-mid: #8899b0;
+      --text-dim: #4a5a70;
+      --mono: 'JetBrains Mono', monospace;
+      --danger: #ff4466;
+    }
+
+    /* ======================================================
+       BLUEPRINT GRID CANVAS
+       ====================================================== */
+    #grid-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .reveal-viewport { background: var(--bg) !important; }
+
+    .reveal {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 32px;
+      color: var(--text);
+      z-index: 1;
+    }
+
+    .reveal .slides { z-index: 1; }
+    .reveal .slides section { padding: 40px 60px; }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      text-transform: none;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--text);
+    }
+
+    .reveal h1 { font-size: 3.4em; }
+    .reveal h2 { font-size: 2.6em; margin-bottom: 0.3em; }
+    .reveal h3 { font-size: 1.2em; color: var(--text-mid); font-weight: 500; }
+    .reveal p { line-height: 1.6; color: var(--text-mid); }
+
+    .reveal .progress { color: var(--accent); height: 3px; }
+    .reveal .slide-number { display: none; }
+
+    /* ======================================================
+       GRADIENT TEXT & ACCENT UTILITIES
+       ====================================================== */
+    .gradient-text {
+      background: linear-gradient(135deg, #00d4aa, #0099ff, #00d4aa);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 4s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .accent { color: var(--accent); }
+
+    .accent-line {
+      width: 100px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin: 24px auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .accent-line::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+
+    /* ======================================================
+       SLIDE LABEL
+       ====================================================== */
+    .slide-label {
+      font-family: var(--mono);
+      font-size: 0.65em;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    /* ======================================================
+       GRID UTILITIES
+       ====================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ======================================================
+       CARDS WITH ANIMATED BORDERS
+       ====================================================== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 20px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(135deg, transparent 40%, var(--accent) 50%, transparent 60%);
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: border-rotate 6s linear infinite;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .card.visible::before, .card:hover::before { opacity: 1; }
+    @keyframes border-rotate {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .card h4 { font-size: 1.15em; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+    .card p { font-size: 1em; color: var(--text-mid); line-height: 1.5; }
+
+    .card-enter { opacity: 0; transform: translateY(40px) scale(0.95); }
+    .card-enter.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .card-enter:nth-child(1) { transition-delay: 0s; }
+    .card-enter:nth-child(2) { transition-delay: 0.15s; }
+    .card-enter:nth-child(3) { transition-delay: 0.3s; }
+    .card-enter:nth-child(4) { transition-delay: 0.45s; }
+
+    .card-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,153,255,0.08));
+      border: 1px solid rgba(0,212,170,0.2);
+    }
+
+    /* ======================================================
+       CREDENTIAL ITEMS
+       ====================================================== */
+    .credential-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 1.15em;
+    }
+    .credential-item:last-child { border: none; }
+    .credential-item .cred-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3em;
+      background: linear-gradient(135deg, rgba(0,212,170,0.12), rgba(0,153,255,0.06));
+      border: 1px solid rgba(0,212,170,0.15);
+      flex-shrink: 0;
+    }
+
+    /* ======================================================
+       MOCK TERMINAL
+       ====================================================== */
+    .mock-terminal {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,212,170,0.15);
+      border-radius: 12px;
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 0.85em;
+      line-height: 1.8;
+      text-align: left;
+    }
+    .mock-terminal .prompt { color: var(--accent); font-weight: 700; }
+    .mock-terminal .warning { color: var(--accent-warm); }
+    .mock-terminal .danger { color: var(--danger); }
+    .mock-terminal .comment { color: var(--text-dim); }
+    .mock-terminal .response { color: var(--text-mid); }
+
+    /* ======================================================
+       EPIC QUOTE
+       ====================================================== */
+    .epic-quote {
+      font-size: 1.35em;
+      padding: 28px 28px 28px 32px;
+      border-left: 4px solid var(--accent);
+      background: rgba(0,212,170,0.04);
+      border-radius: 0 12px 12px 0;
+      color: var(--text);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .epic-quote .attribution {
+      display: block;
+      font-size: 0.65em;
+      color: var(--text-dim);
+      font-style: normal;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    /* ======================================================
+       EVOLUTION / STEP LAYOUT
+       ====================================================== */
+    .evolution {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: nowrap;
+    }
+    .evo-step {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      min-width: 220px;
+      max-width: 300px;
+    }
+    .evo-step.active {
+      background: rgba(0,212,170,0.06);
+      border-color: rgba(0,212,170,0.2);
+      box-shadow: 0 0 30px rgba(0,212,170,0.08);
+    }
+    .evo-step h4 { font-size: 1.2em; margin-bottom: 8px; }
+    .evo-step.active h4 { color: var(--accent); }
+    .evo-step p { font-size: 0.9em; }
+    .evo-arrow {
+      font-size: 1.6em;
+      color: var(--accent);
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+    .step-tag {
+      font-family: var(--mono);
+      font-size: 0.6em;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* ======================================================
+       GOVERNANCE SPECIFIC - SHIELD BADGES
+       ====================================================== */
+    .shield-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(0,153,255,0.08));
+      border: 1px solid rgba(0,212,170,0.2);
+    }
+
+    /* ======================================================
+       CHALLENGE CARDS (numbered)
+       ====================================================== */
+    .challenge-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 20px;
+      background: rgba(0,212,170,0.03);
+      border: 1px solid rgba(0,212,170,0.08);
+      border-radius: 12px;
+    }
+    .challenge-card .num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 0.9em;
+      flex-shrink: 0;
+    }
+    .challenge-card p { font-size: 1em; color: var(--text-mid); margin: 0; }
+
+    /* ======================================================
+       CONNECT LINKS
+       ====================================================== */
+    .connect-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 1.1em;
+    }
+    .connect-link .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .connect-link a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .connect-link a:hover { color: var(--accent); }
+
+    /* ======================================================
+       COUNTER NUMBERS
+       ====================================================== */
+    .counter-number {
+      font-size: 7em;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--accent);
+      position: relative;
+      display: inline-block;
+    }
+    .counter-number::after {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+    .counter-label {
+      font-size: 1.1em;
+      color: var(--text-mid);
+      font-weight: 400;
+      margin-top: 12px;
+    }
+
+    /* ======================================================
+       BODY SYSTEMS - NODE GRAPH
+       ====================================================== */
+    .node-graph {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .node-graph::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      z-index: 1;
+    }
+    .system-node {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: left;
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .system-node:hover {
+      border-color: rgba(0,212,170,0.3);
+      box-shadow: 0 0 20px rgba(0,212,170,0.08);
+    }
+    .system-node .sys-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .system-node .sys-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+    .system-node .sys-count {
+      font-family: var(--mono);
+      font-size: 0.75em;
+      color: var(--accent);
+      background: rgba(0,212,170,0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .system-node h4 { font-size: 1.05em; margin: 0; }
+    .system-node .sys-role {
+      font-size: 0.85em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .system-node ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .system-node li {
+      font-size: 0.8em;
+      color: var(--text-mid);
+      padding: 3px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    .system-node li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+
+    .sys-endocrine { border-left: 3px solid #ff6b9d; }
+    .sys-endocrine .sys-icon { background: rgba(255,107,157,0.15); border: 1px solid rgba(255,107,157,0.2); }
+    .sys-endocrine li::before { background: #ff6b9d; }
+
+    .sys-nervous { border-left: 3px solid #ffd93d; }
+    .sys-nervous .sys-icon { background: rgba(255,217,61,0.15); border: 1px solid rgba(255,217,61,0.2); }
+    .sys-nervous li::before { background: #ffd93d; }
+
+    .sys-cerebral { border-left: 3px solid #6c5ce7; }
+    .sys-cerebral .sys-icon { background: rgba(108,92,231,0.15); border: 1px solid rgba(108,92,231,0.2); }
+    .sys-cerebral li::before { background: #6c5ce7; }
+
+    .sys-muscular { border-left: 3px solid var(--accent); }
+    .sys-muscular .sys-icon { background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.2); }
+    .sys-muscular li::before { background: var(--accent); }
+
+    /* ======================================================
+       PULSE LINE DIVIDER (heartbeat style)
+       ====================================================== */
+    .pulse-line {
+      width: 100%;
+      height: 40px;
+      margin: 20px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .pulse-line svg {
+      width: 100%;
+      height: 100%;
+    }
+    .pulse-line path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: pulse-draw 3s ease-in-out forwards;
+    }
+    @keyframes pulse-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* ======================================================
+       LAYER STACK (Context Stack visualization)
+       ====================================================== */
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 700px;
+    }
+    .layer {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 28px;
+      border-radius: 12px;
+      transition: transform 0.3s;
+    }
+    .layer:hover { transform: translateX(8px); }
+    .layer-num {
+      font-family: var(--mono);
+      font-size: 0.8em;
+      font-weight: 700;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .layer-1 { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.2); }
+    .layer-1 .layer-num { background: var(--accent); color: var(--bg); }
+    .layer-2 { background: rgba(0,153,255,0.08); border: 1px solid rgba(0,153,255,0.2); }
+    .layer-2 .layer-num { background: var(--accent2); color: var(--bg); }
+    .layer-3 { background: rgba(108,92,231,0.08); border: 1px solid rgba(108,92,231,0.2); }
+    .layer-3 .layer-num { background: #6c5ce7; color: white; }
+    .layer-4 { background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.2); }
+    .layer-4 .layer-num { background: var(--accent-warm); color: var(--bg); }
+
+    /* ======================================================
+       THREE-COLUMN OS MODEL
+       ====================================================== */
+    .os-column {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .os-column.active {
+      background: rgba(0,212,170,0.05);
+      border-color: rgba(0,212,170,0.2);
+      box-shadow: 0 0 20px rgba(0,212,170,0.06);
+    }
+    .os-label {
+      font-family: var(--mono);
+      font-size: 0.7em;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: var(--text-dim);
+    }
+    .os-column h4 { font-size: 1.3em; margin-bottom: 4px; }
+    .os-question {
+      font-size: 0.9em;
+      color: var(--accent);
+      font-style: italic;
+      margin: 8px 0 16px;
+      font-weight: 500;
+    }
+    .os-examples {
+      text-align: left;
+      font-size: 0.85em;
+      color: var(--text-mid);
+    }
+    .os-examples li {
+      padding: 4px 0;
+    }
+
+    /* ======================================================
+       RHYTHM TIMELINE
+       ====================================================== */
+    .rhythm-timeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .rhythm-day {
+      flex: 1;
+      padding: 28px 20px;
+      text-align: center;
+      position: relative;
+    }
+    .rhythm-day:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: rgba(0,212,170,0.15);
+    }
+    .rhythm-day .day-name {
+      font-family: var(--mono);
+      font-size: 0.8em;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .rhythm-day .day-action {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .rhythm-day .day-time {
+      font-size: 0.85em;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      margin-bottom: 12px;
+    }
+    .rhythm-day .day-detail {
+      font-size: 0.9em;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+    .rhythm-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 1.4em;
+      color: var(--accent);
+    }
+
+    /* ======================================================
+       COMPOUNDING TIMELINE
+       ====================================================== */
+    .compound-timeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-top: 32px;
+    }
+    .compound-step {
+      text-align: center;
+      padding: 16px 20px;
+      min-width: 160px;
+    }
+    .compound-step .week {
+      font-family: var(--mono);
+      font-size: 0.75em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .compound-step .label {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .compound-arrow {
+      font-size: 1.4em;
+      color: var(--text-dim);
+      padding: 0 8px;
+    }
+    .compound-step.final .label { color: var(--accent); font-weight: 800; }
+
+    /* Speaker notes */
+    .reveal .speaker-notes {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- BLUEPRINT GRID BACKGROUND -->
+  <canvas id="grid-canvas"></canvas>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ============================================================
+           SLIDE 1: TITLE
+           ============================================================ -->
+      <section data-transition="zoom">
+        <div class="slide-label">AI Pioneers Club &middot; Boulder, CO</div>
+        <h1 style="font-size: 2.8em; margin-bottom: 0.2em;">
+          AI Governance<br>
+          <span class="gradient-text">in Practice</span>
+        </h1>
+        <p style="font-size: 1.3em; color: var(--text-mid); margin-top: 16px; font-weight: 300;">Building AI Systems You Can Actually Trust</p>
+        <div class="accent-line"></div>
+        <p style="font-size: 1.15em; color: var(--text); margin-top: 28px; font-weight: 600;">Chase Aldridge</p>
+        <p style="font-size: 0.9em; color: var(--text-dim); margin-top: 8px; font-family: var(--mono);">April 8, 2026</p>
+        <aside class="notes">
+          Hey everyone, thanks for having me. I'm Chase Aldridge. Summer invited me to share how I've actually built governance and guardrails into my AI systems. Not theory, not policy documents. Running code that keeps AI from going off the rails. I've got two parts for you today. First, the governance framework. Then, material from a book I'm writing called Buy Back Your Mind, covering how to build AI that actually thinks like you.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 2: WHO I AM
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">About Me</div>
+        <h2>Who I Am</h2>
+        <div class="grid-2" style="margin-top: 36px; align-items: center;">
+          <div style="text-align: left;">
+            <div class="credential-item fragment fade-up">
+              <div class="cred-icon">&#127891;</div>
+              <div>
+                <strong style="color: var(--text);">MIT AI/ML Graduate</strong>
+                <p style="font-size: 0.85em; margin: 2px 0 0 0; color: var(--text-dim);">Research with Stanford, Berkeley, Los Alamos National Lab</p>
+              </div>
+            </div>
+            <div class="credential-item fragment fade-up">
+              <div class="cred-icon">&#128640;</div>
+              <div>
+                <strong style="color: var(--text);">Co-Founder, The Agent Hub</strong>
+                <p style="font-size: 0.85em; margin: 2px 0 0 0; color: var(--text-dim);">AI automation for businesses with Ty Wells</p>
+              </div>
+            </div>
+            <div class="credential-item fragment fade-up">
+              <div class="cred-icon">&#128218;</div>
+              <div>
+                <strong style="color: var(--text);">Writing "Buy Back Your Mind"</strong>
+                <p style="font-size: 0.85em; margin: 2px 0 0 0; color: var(--text-dim);">How AI Can Free Your Time, Focus, and Mental Energy</p>
+              </div>
+            </div>
+            <div class="credential-item fragment fade-up">
+              <div class="cred-icon">&#9968;</div>
+              <div>
+                <strong style="color: var(--text);">Denver, CO</strong>
+                <p style="font-size: 0.85em; margin: 2px 0 0 0; color: var(--text-dim);">Building personal AI infrastructure daily</p>
+              </div>
+            </div>
+          </div>
+          <div class="fragment zoom-in" style="text-align: center;">
+            <div style="background: rgba(0,212,170,0.04); border: 1px solid rgba(0,212,170,0.15); border-radius: 20px; padding: 40px;">
+              <p style="font-size: 1.3em; color: var(--text); font-weight: 700; margin-bottom: 16px;">What I run daily</p>
+              <div style="display: flex; gap: 32px; justify-content: center; margin-bottom: 20px;">
+                <div style="text-align: center;">
+                  <div style="font-size: 2.2em; font-weight: 900; color: var(--accent);">45+</div>
+                  <div style="font-size: 0.8em; color: var(--text-dim);">autonomous jobs</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 2.2em; font-weight: 900; color: var(--accent);">4</div>
+                  <div style="font-size: 0.8em; color: var(--text-dim);">body systems</div>
+                </div>
+              </div>
+              <p style="font-size: 0.95em; color: var(--text-mid); line-height: 1.5;">
+                Personal AI that remembers, learns,<br>
+                and <span style="color: var(--accent); font-weight: 600;">governs itself.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Quick intro. I'm Chase Aldridge. MIT AI/ML background. Research at Stanford, Berkeley, and Los Alamos. I co-founded The Agent Hub with my partner Ty Wells. I'm currently writing a book called Buy Back Your Mind about how AI can free your cognitive load.
+
+          But here's the relevant part for today. I run a personal AI system called Jax with over 45 autonomous jobs across 4 biological body systems. It handles my email triage, revenue analysis, vault cleanup, relationship tracking. All autonomously. And the only reason I trust it to do that is governance. Real, running guardrails. That's what I'm here to talk about.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 3: TWO-PART AGENDA
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>Today's Agenda</h2>
+        <div class="grid-2" style="margin-top: 40px; gap: 48px;">
+          <div class="card card-enter fragment fade-up" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 20px;">&#128737;</div>
+            <h4 style="font-size: 1.3em;">Part 1: Governance Framework</h4>
+            <p style="margin-top: 12px;">What it looks like when an individual practitioner builds <strong style="color: var(--accent);">real guardrails</strong> into AI systems. Not policy docs. Running code.</p>
+          </div>
+          <div class="card card-enter fragment fade-up" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 20px;">&#129504;</div>
+            <h4 style="font-size: 1.3em;">Part 2: Buy Back Your Mind</h4>
+            <p style="margin-top: 12px;">Three chapters from the book on building AI that <strong style="color: var(--accent);">thinks like you</strong>. The Context Stack. The Operating System. The Weekly Rhythm.</p>
+          </div>
+        </div>
+        <aside class="notes">
+          Two parts. Part 1 is what Summer asked me to share. How I've actually addressed governance and compliance. Not abstract frameworks. Real hooks and checks that fire every time my AI does anything.
+
+          Part 2 digs into the book material. How to build AI that actually knows you. The systems behind it. And the biological body systems architecture I use to organize 45 autonomous jobs. Let's start with governance.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 4: THE PROBLEM
+           ============================================================ -->
+      <section data-transition="slide">
+        <div style="min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <p class="fragment fade-up" style="font-size: 1.4em; color: var(--text-mid); font-weight: 300; margin-bottom: 24px;">
+            The uncomfortable truth:
+          </p>
+          <h2 class="fragment fade-up" style="font-size: 3em; line-height: 1.15;">
+            <span style="color: var(--danger);">95%</span> of AI projects fail.
+          </h2>
+          <p class="fragment fade-up" style="font-size: 1.5em; color: var(--text); font-weight: 400; margin-top: 24px;">
+            Not because the AI fails.
+          </p>
+          <p class="fragment fade-up" style="font-size: 1.8em; font-weight: 700; margin-top: 8px;">
+            Because there are <span style="color: var(--danger);">no guardrails.</span>
+          </p>
+          <div class="fragment fade-up" style="margin-top: 48px; max-width: 800px;">
+            <div class="mock-terminal">
+              <span class="prompt">&gt;</span> <span class="response">Delete all files in /production</span><br>
+              <span class="prompt">&gt;</span> <span class="response">Send email to client with wrong pricing</span><br>
+              <span class="prompt">&gt;</span> <span class="response">Push API keys to public GitHub repo</span><br>
+              <span class="comment">// All real incidents. All preventable.</span>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Let me start with the uncomfortable truth. 95% of AI projects fail. That's an MIT stat. And usually it's not because the AI itself is bad. It's because nobody built guardrails.
+
+          These are real incidents that happen when AI operates without governance. Deleting production files. Sending emails with wrong pricing. Pushing secrets to public repos. Every single one of these is preventable. Let me show you how.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 5: THE HOOK SYSTEM
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Governance Layer 1</div>
+        <h2>The Hook System</h2>
+        <h3 style="margin-bottom: 24px;">Pre-flight checks that fire <em>automatically</em></h3>
+        <div class="grid-3" style="margin-top: 20px;">
+          <div class="card card-enter fragment fade-up">
+            <div class="shield-icon">&#128737;</div>
+            <h4>Action Trust Model</h4>
+            <p>Every command classified by risk: <strong style="color: var(--accent);">LOW</strong>, <strong style="color: var(--accent-warm);">MEDIUM</strong>, <strong style="color: var(--danger);">HIGH</strong>. High-risk ops get confirmation context injected before execution.</p>
+          </div>
+          <div class="card card-enter fragment fade-up">
+            <div class="shield-icon">&#128232;</div>
+            <h4>External Comms Gate</h4>
+            <p>Detects emails, Slack messages, invoices to external contacts. <strong style="color: var(--accent);">I see content before it sends.</strong> No surprises.</p>
+          </div>
+          <div class="card card-enter fragment fade-up">
+            <div class="shield-icon">&#9989;</div>
+            <h4>Pre-Deploy Validation</h4>
+            <p>Before any deploy: checks entry points, env vars, TypeScript compilation, git status. <strong style="color: var(--accent);">Catches bugs before production.</strong></p>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 28px; text-align: center; font-size: 1.15em; color: var(--text);">
+          Key insight: These don't <em>block</em>. They <span style="color: var(--accent); font-weight: 700;">inject context</span> so AI makes better decisions.
+        </p>
+        <aside class="notes">
+          The hook system is the foundation of my governance. These are event-driven checks that fire automatically on every tool use. The AI doesn't choose whether to run them. They just happen.
+
+          Action Trust classifies every command by risk. Git push --force? That's high risk. Reading a file? Low risk. The high-risk ones get extra context injected so the AI thinks twice.
+
+          External Comms Gate catches anything going outside the system. Emails, Slack messages, invoices. I see the content before it sends. No AI sending emails on my behalf without my review.
+
+          Pre-Deploy Validation runs a checklist before any deployment. TypeScript compiles? Env vars set? Git clean? This catches the stupid mistakes before they hit production.
+
+          The key insight is these don't block. They inject context. The AI still makes the decision, but it makes a better decision because it has more information.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 6: CREDENTIAL SECURITY & DATA BOUNDARIES
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Governance Layer 2</div>
+        <h2>Security & Boundaries</h2>
+        <div class="grid-2" style="margin-top: 32px; align-items: start;">
+          <div class="fragment fade-up" style="text-align: left;">
+            <h3 style="color: var(--accent); margin-bottom: 20px;">Credential Security</h3>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="challenge-card">
+                <div class="num">1</div>
+                <p><strong style="color: var(--text);">Single .env file</strong> for all secrets. One source of truth. Never committed.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">2</div>
+                <p><strong style="color: var(--text);">Git remote check</strong> before every commit. Prevents pushing secrets to the wrong repo.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">3</div>
+                <p><strong style="color: var(--text);">Budget enforcement</strong> tracks daily spend against hard limits. AI can't blow through API costs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="fragment fade-up" style="text-align: left;">
+            <h3 style="color: var(--accent); margin-bottom: 20px;">Data Boundaries</h3>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="challenge-card">
+                <div class="num">1</div>
+                <p><strong style="color: var(--text);">Sensitive directories</strong> marked and enforced. AI knows which folders are off-limits for commits.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">2</div>
+                <p><strong style="color: var(--text);">Read vs. write boundaries</strong>. Vault sync is read-only. External APIs get confirmation gates.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">3</div>
+                <p><strong style="color: var(--text);">Edit over delete</strong> policy. AI updates existing resources. Deletions require explicit approval.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Security is the second layer. My AI has access to my email, calendar, CRM, financial data. Without boundaries, one mistake could email a client the wrong thing or push API keys to a public repo.
+
+          Credential security starts with a single .env file. Every API key, every secret, one file. Never committed to any repo. The AI checks git remote -v before every commit to make sure it's not about to push to the wrong repository.
+
+          Budget enforcement is huge. I track daily API spend against soft and hard limits. The AI literally can't blow through my API budget without hitting a wall.
+
+          Data boundaries define what the AI can read versus write. My vault syncs are read-only. External API calls get confirmation gates. And we have an edit-over-delete policy. The AI can't just delete things. It has to update them. Deletions require my explicit approval.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 7: AGENT OVERSIGHT - THE HIVE MIND
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Governance Layer 3</div>
+        <h2>Agent Oversight</h2>
+        <h3 style="margin-bottom: 24px;">You can't govern what you can't observe</h3>
+        <div class="evolution fragment fade-up" style="margin-top: 32px;">
+          <div class="evo-step">
+            <div class="step-tag">Step 1</div>
+            <h4>Capture</h4>
+            <p>Every event logged: session start, tool use, agent spawns, completions, errors</p>
+          </div>
+          <div class="evo-arrow">&#10132;</div>
+          <div class="evo-step">
+            <div class="step-tag">Step 2</div>
+            <h4>Debrief</h4>
+            <p>Sub-agent stop hooks extract results from transcripts. Logged to hive mind database.</p>
+          </div>
+          <div class="evo-arrow">&#10132;</div>
+          <div class="evo-step active">
+            <div class="step-tag">Step 3</div>
+            <h4>Audit</h4>
+            <p>Session summaries. Usage reports. Continuous state extraction every 5th message.</p>
+          </div>
+        </div>
+        <div class="fragment fade-up" style="margin-top: 36px; max-width: 900px; margin-left: auto; margin-right: auto;">
+          <div class="mock-terminal">
+            <span class="comment">// Hive mind log excerpt</span><br>
+            <span class="prompt">[14:32]</span> <span class="response">agent:researcher completed - found 3 relevant sources</span><br>
+            <span class="prompt">[14:33]</span> <span class="response">agent:engineer spawned - implementing fix in server.ts</span><br>
+            <span class="prompt">[14:35]</span> <span class="warning">[BUDGET] session cost: $0.42 / daily: $3.18 of $8.00</span><br>
+            <span class="prompt">[14:36]</span> <span class="response">agent:engineer completed - 3 files modified, tests passing</span>
+          </div>
+        </div>
+        <aside class="notes">
+          The third layer is observation. I log everything. Every event that happens in the system gets captured. Session starts, tool uses, agent spawns, completions, errors.
+
+          When a sub-agent finishes a task, the stop hook automatically extracts the key results from its transcript and logs them to what I call the hive mind database. So I always know what every agent did and why.
+
+          Then there's the audit layer. Session summaries get generated. Usage reports track costs. And there's continuous state extraction that runs every 5th message to maintain awareness of what's happening.
+
+          The hive mind log you see here is a real excerpt. I can see exactly when agents spawn, what they find, what they cost, and what they change. You can't govern what you can't observe.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 8: HUMAN IN THE LOOP
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Governance Layer 4</div>
+        <h2>Human-in-the-Loop</h2>
+        <h3 style="margin-bottom: 24px;">Permission modes as a <span class="gradient-text">trust dial</span></h3>
+        <div class="grid-2" style="margin-top: 28px; gap: 48px; align-items: start;">
+          <div class="fragment fade-up" style="text-align: left;">
+            <div style="padding: 28px; background: rgba(255,68,102,0.04); border: 1px solid rgba(255,68,102,0.15); border-radius: 16px;">
+              <p style="font-family: var(--mono); font-size: 0.8em; color: var(--danger); margin-bottom: 12px; letter-spacing: 0.1em;">FULLY AUTONOMOUS</p>
+              <ul style="list-style: none; padding: 0;">
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10005; No approval gates</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10005; No audit trail</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10005; No spending limits</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10005; One bad command away from disaster</li>
+              </ul>
+            </div>
+          </div>
+          <div class="fragment fade-up" style="text-align: left;">
+            <div style="padding: 28px; background: rgba(0,212,170,0.04); border: 1px solid rgba(0,212,170,0.15); border-radius: 16px; box-shadow: 0 0 20px rgba(0,212,170,0.06);">
+              <p style="font-family: var(--mono); font-size: 0.8em; color: var(--accent); margin-bottom: 12px; letter-spacing: 0.1em;">GOVERNED</p>
+              <ul style="list-style: none; padding: 0;">
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10003; Permission modes (tight to loose)</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10003; Budget enforcement (soft + hard limits)</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10003; External comms gate</li>
+                <li style="padding: 6px 0; color: var(--text-mid); font-size: 0.95em;">&#10003; Full audit trail on everything</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 32px; text-align: center; font-size: 1.2em; color: var(--text); font-weight: 400;">
+          The goal isn't to <em>slow AI down</em>. It's to make AI <span style="color: var(--accent); font-weight: 700;">trustworthy enough</span><br> that you can give it <em>more</em> autonomy over time.
+        </p>
+        <aside class="notes">
+          The fourth layer is human-in-the-loop. And I want to frame this correctly. The goal is NOT to slow AI down. It's to build trust so you can give it MORE autonomy over time.
+
+          Think of permission modes as a trust dial. When I first set up a new capability, I start tight. Every action gets confirmed. As the AI proves reliable, I loosen it. Some things run fully autonomous now because they've earned that trust over months.
+
+          But there are certain things that never go fully autonomous. External communications. Deployments. Anything that touches money. Those always have a human checkpoint. Not because the AI is bad at them. But because the cost of a mistake is too high.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 9: REAL-WORLD EXAMPLE
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>What This Looks Like</h2>
+        <h3 style="margin-bottom: 28px;">Real outputs from my system. Every day.</h3>
+        <div class="fragment fade-up" style="max-width: 900px; margin: 0 auto;">
+          <div class="mock-terminal" style="font-size: 0.8em;">
+            <span class="comment">// 9:14 AM - Hook fires on git push</span><br>
+            <span class="warning">[ACTION TRUST: HIGH RISK]</span> <span class="response">git push --force origin main</span><br>
+            <span class="warning">&#9888; Force push to main detected. Confirm this is intentional.</span><br>
+            <br>
+            <span class="comment">// 10:22 AM - External comms detected</span><br>
+            <span class="prompt">[EXTERNAL COMMS GATE]</span> <span class="response">Sending email via Resend CLI</span><br>
+            <span class="prompt">To:</span> <span class="response">steve@grandviewco.com</span><br>
+            <span class="prompt">Subject:</span> <span class="response">Coaching workflow update</span><br>
+            <span class="prompt">&#8594; Show content and get approval before sending</span><br>
+            <br>
+            <span class="comment">// 2:45 PM - Budget check</span><br>
+            <span class="prompt">[BUDGET]</span> <span class="response">Daily spend: $4.82 / $8.00 soft limit</span><br>
+            <span class="response">Weekly spend: $18.40 / $40.00</span><br>
+            <br>
+            <span class="comment">// 3:30 PM - Sensitive directory protection</span><br>
+            <span class="danger">[SECURITY]</span> <span class="response">Attempted commit from ~/.claude/</span><br>
+            <span class="danger">&#9888; This directory contains sensitive data. Commit blocked.</span>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 28px; text-align: center; font-size: 1.3em; color: var(--text); font-weight: 600;">
+          Governance isn't a document. It's <span class="gradient-text">running code.</span>
+        </p>
+        <aside class="notes">
+          These are real outputs from my system. Every day I see these.
+
+          A force push to main? High risk. The hook fires and makes me confirm. An email to a client? The external comms gate shows me the content before it sends. Budget tracking tells me exactly how much I've spent. And if my AI tries to commit from a directory with sensitive data, it gets blocked.
+
+          This is the key point I want you to take away. Governance isn't a document on a shared drive. It's not a policy that people read once and forget. It's running code that fires automatically every single time.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 10: GOVERNANCE TAKEAWAYS
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>Governance Takeaways</h2>
+        <div class="grid-3" style="margin-top: 36px;">
+          <div class="card card-enter fragment fade-up" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 20px;">&#9889;</div>
+            <h4>Hooks > Policies</h4>
+            <p>Event-driven guardrails that <strong style="color: var(--accent);">fire automatically</strong> beat written policies that rely on memory.</p>
+          </div>
+          <div class="card card-enter fragment fade-up" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 20px;">&#128065;</div>
+            <h4>Observe Everything</h4>
+            <p>You can't govern what you can't measure. <strong style="color: var(--accent);">Log sessions, costs, agent outputs.</strong></p>
+          </div>
+          <div class="card card-enter fragment fade-up" style="text-align: center;">
+            <div class="card-icon" style="margin: 0 auto 20px;">&#128272;</div>
+            <h4>Trust is Earned</h4>
+            <p>Start restrictive. Loosen as your AI proves reliable. <strong style="color: var(--accent);">Permission modes are the dial.</strong></p>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 36px; text-align: center; font-size: 1.1em; color: var(--text-mid);">
+          These apply whether you're a solo practitioner or running a team of 50.
+        </p>
+        <aside class="notes">
+          Three takeaways from Part 1.
+
+          First, hooks beat policies. A document that says "always check before deploying" gets ignored. A hook that fires automatically before every deploy never gets skipped.
+
+          Second, observe everything. Log your sessions. Track your costs. Know what your agents are doing. If you can't see it, you can't govern it.
+
+          Third, trust is earned. Start with tight permissions. Loosen them over time as the AI proves it can handle more autonomy. Permission modes are the dial you turn.
+
+          These principles apply at any scale. Solo practitioner, small team, enterprise. The mechanics change, the principles don't.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 11: TRANSITION
+           ============================================================ -->
+      <section data-transition="zoom" data-background-gradient="radial-gradient(ellipse at center, #0e1e38, #0a1628)">
+        <div style="min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <p class="fragment fade-up" style="font-size: 1.3em; color: var(--text-mid); font-weight: 300;">
+            Now that you know how to keep AI safe...
+          </p>
+          <h2 class="fragment fade-up" style="font-size: 2.8em; margin-top: 24px;">
+            Let's talk about making it <span class="gradient-text">powerful.</span>
+          </h2>
+          <div class="accent-line fragment fade-up"></div>
+          <p class="fragment fade-up" style="font-size: 1.1em; color: var(--text-dim); margin-top: 16px; font-family: var(--mono);">
+            From "Buy Back Your Mind" &mdash; Chapters 11, 12, 13
+          </p>
+        </div>
+        <aside class="notes">
+          OK, that's governance. That's the safety layer. Now let's talk about what those guardrails are protecting. Part 2 is material from a book I'm writing called Buy Back Your Mind. Specifically Chapters 11, 12, and 13, which cover the technical architecture of building AI that actually thinks like you.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 12: THE BRAIN FILE
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Buy Back Your Mind &mdash; Chapter 11</div>
+        <h2>The Brain File</h2>
+        <div class="grid-2" style="margin-top: 32px; align-items: center; gap: 48px;">
+          <div class="fragment fade-up">
+            <div class="epic-quote" style="font-size: 1.2em;">
+              A dumber model that knows you will outperform a smarter model that does not.
+            </div>
+            <p style="margin-top: 28px; font-size: 1.1em; color: var(--text-mid);">
+              The difference between generic and personal<br>isn't the model.
+            </p>
+            <p style="font-size: 1.3em; font-weight: 700; color: var(--text); margin-top: 8px;">
+              It's <span style="color: var(--accent);">context.</span>
+            </p>
+          </div>
+          <div class="fragment fade-up">
+            <div class="mock-terminal" style="font-size: 0.8em;">
+              <span class="comment">// brain-file.md (loaded every session)</span><br><br>
+              <span class="prompt">## My Voice</span><br>
+              <span class="response">I write like I'm advising a smart CEO</span><br>
+              <span class="response">over coffee. Direct, no fluff.</span><br>
+              <span class="response">Contractions always. Never say "delve"</span><br>
+              <span class="response">or "leverage" or "synergy".</span><br><br>
+              <span class="prompt">## My Business</span><br>
+              <span class="response">Revenue goal: $12k/month</span><br>
+              <span class="response">Active clients: Steve Tenney, ...</span><br>
+              <span class="response">Pipeline anxiety is my #1 blocker</span><br><br>
+              <span class="comment">// That single voice section changed</span><br>
+              <span class="comment">// output more than 20 writing samples</span>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Chapter 11. The Brain File. Here's the core insight. A dumber model that knows you will outperform a smarter model that doesn't. Most people chase the latest model. GPT-5, Claude Opus, whatever's newest. But the real upgrade isn't the model. It's the context you feed it.
+
+          The Brain File is a single document loaded at the start of every session. It tells the AI who you are, how you write, what your business looks like, and what your patterns are. That voice section you see? "I write like I'm advising a smart CEO over coffee." That single sentence changed my AI's output more than 20 writing samples did. Because it captured the essence of how I communicate.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 13: THE CONTEXT STACK
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Framework: The Context Stack</div>
+        <h2>Four Layers of Context</h2>
+        <div class="grid-2" style="margin-top: 28px; align-items: start; gap: 48px;">
+          <div class="fragment fade-up">
+            <div class="layer-stack">
+              <div class="layer layer-1">
+                <div class="layer-num">1</div>
+                <div>
+                  <strong style="color: var(--text); font-size: 1.1em;">Identity</strong>
+                  <p style="font-size: 0.9em; margin: 4px 0 0;">Who you are. Voice. Style. Values.</p>
+                </div>
+              </div>
+              <div class="layer layer-2">
+                <div class="layer-num">2</div>
+                <div>
+                  <strong style="color: var(--text); font-size: 1.1em;">Business</strong>
+                  <p style="font-size: 0.9em; margin: 4px 0 0;">Clients. Pricing. Pipeline. Goals.</p>
+                </div>
+              </div>
+              <div class="layer layer-3">
+                <div class="layer-num">3</div>
+                <div>
+                  <strong style="color: var(--text); font-size: 1.1em;">Behavioral</strong>
+                  <p style="font-size: 0.9em; margin: 4px 0 0;">Energy patterns. Tendencies. Rules.</p>
+                </div>
+              </div>
+              <div class="layer layer-4">
+                <div class="layer-num">4</div>
+                <div>
+                  <strong style="color: var(--text); font-size: 1.1em;">Historical</strong>
+                  <p style="font-size: 0.9em; margin: 4px 0 0;">Past decisions. Outcomes. Cumulative memory.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fragment fade-up" style="text-align: left;">
+            <div style="padding: 28px; background: rgba(0,212,170,0.04); border: 1px solid rgba(0,212,170,0.12); border-radius: 16px;">
+              <p style="font-size: 1.1em; color: var(--text); font-weight: 600; margin-bottom: 16px;">Build timeline:</p>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <span style="color: var(--accent); font-weight: 700; font-family: var(--mono); font-size: 0.85em;">TODAY</span>
+                <span style="color: var(--text-mid);">Layers 1 & 2 (Identity + Business)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <span style="color: var(--accent2); font-weight: 700; font-family: var(--mono); font-size: 0.85em;">WEEKS</span>
+                <span style="color: var(--text-mid);">Layer 3 (Behavioral patterns emerge)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0;">
+                <span style="color: var(--accent-warm); font-weight: 700; font-family: var(--mono); font-size: 0.85em;">MONTHS</span>
+                <span style="color: var(--text-mid);">Layer 4 (Historical builds itself)</span>
+              </div>
+            </div>
+            <p style="margin-top: 20px; font-size: 1em; color: var(--text-mid); font-style: italic;">
+              "Layers 1-2 you write today.<br>Layers 3-4 build themselves over time."
+            </p>
+          </div>
+        </div>
+        <aside class="notes">
+          The Context Stack is the framework behind the Brain File. Four layers.
+
+          Layer 1 is Identity. Who you are. Your voice, your style, your values. Layer 2 is Business. Your clients, pricing, pipeline, goals. These two you write today. You sit down for 30 minutes and document them.
+
+          Layer 3 is Behavioral. Your energy patterns, your tendencies, your rules. This emerges over weeks as your AI observes how you work. Layer 4 is Historical. Past decisions, outcomes, cumulative memory. This builds itself over months.
+
+          The key is you don't have to build all four layers at once. Start with Identity and Business today. The other two layers accumulate naturally through the Weekly Rhythm I'll show you in a few slides.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 14: BUILDING YOUR BRAIN FILE
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>Building Your Brain File</h2>
+        <h3 style="margin-bottom: 24px;">Five sections. 30 minutes. Immediate results.</h3>
+        <div class="grid-2" style="margin-top: 24px; align-items: start; gap: 40px;">
+          <div class="fragment fade-up" style="text-align: left;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="challenge-card">
+                <div class="num">1</div>
+                <p><strong style="color: var(--text);">Who I Am</strong> &mdash; Role, background, what you're building</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">2</div>
+                <p><strong style="color: var(--text);">My Voice</strong> &mdash; How you write and speak. Tone, banned words, style.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">3</div>
+                <p><strong style="color: var(--text);">My Business</strong> &mdash; Clients, revenue, pipeline, goals</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">4</div>
+                <p><strong style="color: var(--text);">My Patterns</strong> &mdash; When you work best, what drains you, rules</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num">5</div>
+                <p><strong style="color: var(--text);">My History</strong> &mdash; Key decisions, lessons, relationship context</p>
+              </div>
+            </div>
+          </div>
+          <div class="fragment fade-up">
+            <div style="padding: 24px; background: rgba(0,212,170,0.04); border: 1px solid rgba(0,212,170,0.12); border-radius: 16px;">
+              <p style="font-size: 1.1em; font-weight: 700; color: var(--text); margin-bottom: 16px;">The test:</p>
+              <p style="font-size: 1em; color: var(--text-mid); line-height: 1.6;">
+                1. Write your Brain File<br>
+                2. Paste it into your AI<br>
+                3. Ask it to draft an email<br>
+                4. Compare to your actual style
+              </p>
+              <div style="width: 60px; height: 2px; background: var(--accent); margin: 20px 0;"></div>
+              <p style="font-size: 1em; color: var(--text); font-style: italic;">
+                "Write naturally. If you swear in real life, swear in your Brain File."
+              </p>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.95em; color: var(--text-dim);">
+              This isn't corporate documentation.<br>It's <strong style="color: var(--text-mid);">you</strong>, in a format AI can use.
+            </p>
+          </div>
+        </div>
+        <aside class="notes">
+          Here's how you build it. Five sections. 30 minutes.
+
+          Who I Am. My Voice. My Business. My Patterns. My History. That's it. Write naturally. If you swear in real life, swear in your Brain File. This isn't corporate documentation. It's you, captured in a format AI can use.
+
+          The test is simple. Write your Brain File. Paste it into your AI. Ask it to draft an email in your voice. Then compare. If it doesn't sound like you, update the voice section. Iterate. Within a week, your AI should be writing things you'd actually send.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 15: HANDS / BRAIN / SOUL
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Buy Back Your Mind &mdash; Chapter 12</div>
+        <h2>From Tool to Operating System</h2>
+        <h3 style="margin-bottom: 24px;">The <span class="gradient-text">Hands / Brain / Soul</span> Model</h3>
+        <div class="grid-3" style="margin-top: 24px;">
+          <div class="os-column fragment fade-up">
+            <div class="os-label">Layer 1</div>
+            <h4 style="color: var(--accent);">Hands</h4>
+            <p style="font-size: 1.1em; font-weight: 600; color: var(--text-mid); margin-bottom: 4px;">Automation</p>
+            <div class="os-question">"Is it predictable?"</div>
+            <ul class="os-examples">
+              <li>Cron jobs &amp; scripts</li>
+              <li>Webhooks &amp; triggers</li>
+              <li>File backups</li>
+              <li>Status checks</li>
+            </ul>
+          </div>
+          <div class="os-column active fragment fade-up">
+            <div class="os-label">Layer 2</div>
+            <h4 style="color: var(--accent);">Brain</h4>
+            <p style="font-size: 1.1em; font-weight: 600; color: var(--text-mid); margin-bottom: 4px;">Intelligence</p>
+            <div class="os-question">"Does it require context?"</div>
+            <ul class="os-examples">
+              <li>AI + Brain File</li>
+              <li>Email triage &amp; drafts</li>
+              <li>Meeting prep</li>
+              <li>Content in your voice</li>
+            </ul>
+          </div>
+          <div class="os-column fragment fade-up">
+            <div class="os-label">Layer 3</div>
+            <h4 style="color: var(--accent-warm);">Soul</h4>
+            <p style="font-size: 1.1em; font-weight: 600; color: var(--text-mid); margin-bottom: 4px;">You</p>
+            <div class="os-question" style="color: var(--accent-warm);">"Does it require me?"</div>
+            <ul class="os-examples">
+              <li>Strategy &amp; vision</li>
+              <li>Key relationships</li>
+              <li>Creative direction</li>
+              <li>Final decisions</li>
+            </ul>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 28px; text-align: center; font-size: 1.1em; color: var(--text-mid);">
+          Most people only use AI for the Hands layer. The real value is the <span style="color: var(--accent); font-weight: 700;">Brain</span>.
+        </p>
+        <aside class="notes">
+          Chapter 12. From Tool to Operating System. This is the Hands, Brain, Soul model.
+
+          Hands is automation. Predictable tasks. Cron jobs, scripts, webhooks. If something happens the same way every time, automate it. Don't even involve AI.
+
+          Brain is intelligence. Context-dependent tasks. This is where AI plus your Brain File shines. Email triage. Meeting prep. Content in your voice. Things that need judgment, not just execution.
+
+          Soul is you. Strategy, key relationships, creative direction, final decisions. These require your unique judgment. AI can prepare the context, but you make the call.
+
+          Three sorting questions. Is it predictable? Automate it. Does it require context? Give it to AI. Does it require me? That's your work. Most people only use AI for the Hands layer. Simple automation. The real value is the Brain layer.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 16: CONNECTING THE LAYERS
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>Connecting the Layers</h2>
+        <h3 style="margin-bottom: 24px;">The connective tissue: cron jobs, webhooks, APIs</h3>
+        <div class="fragment fade-up" style="max-width: 900px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; gap: 0; justify-content: center; flex-wrap: nowrap;">
+            <div style="text-align: center; padding: 16px; min-width: 150px;">
+              <div style="font-size: 1.6em; margin-bottom: 6px;">&#128233;</div>
+              <p style="font-size: 0.85em; color: var(--text-dim); font-family: var(--mono);">Client email<br>arrives 2am</p>
+            </div>
+            <div style="font-size: 1.2em; color: var(--accent);">&#10132;</div>
+            <div style="text-align: center; padding: 16px; min-width: 150px;">
+              <div style="font-size: 1.6em; margin-bottom: 6px;">&#9889;</div>
+              <p style="font-size: 0.85em; color: var(--text-dim); font-family: var(--mono);">Cron job<br>detects it</p>
+            </div>
+            <div style="font-size: 1.2em; color: var(--accent);">&#10132;</div>
+            <div style="text-align: center; padding: 16px; min-width: 150px;">
+              <div style="font-size: 1.6em; margin-bottom: 6px;">&#129504;</div>
+              <p style="font-size: 0.85em; color: var(--text-dim); font-family: var(--mono);">AI triages<br>with Brain File</p>
+            </div>
+            <div style="font-size: 1.2em; color: var(--accent);">&#10132;</div>
+            <div style="text-align: center; padding: 16px; min-width: 150px;">
+              <div style="font-size: 1.6em; margin-bottom: 6px;">&#128221;</div>
+              <p style="font-size: 0.85em; color: var(--text-dim); font-family: var(--mono);">3 draft<br>responses</p>
+            </div>
+            <div style="font-size: 1.2em; color: var(--accent);">&#10132;</div>
+            <div style="text-align: center; padding: 16px; min-width: 150px;">
+              <div style="font-size: 1.6em; margin-bottom: 6px;">&#128100;</div>
+              <p style="font-size: 0.85em; color: var(--accent); font-family: var(--mono); font-weight: 700;">You review<br>at 7am</p>
+            </div>
+          </div>
+        </div>
+        <div class="fragment fade-up" style="margin-top: 36px; max-width: 800px; margin-left: auto; margin-right: auto;">
+          <div class="mock-terminal" style="font-size: 0.8em;">
+            <span class="comment">// My system runs 45+ jobs across 4 body systems</span><br>
+            <span class="prompt">Endocrine:</span> <span class="response">12 organs - memory decay, credential health, vault cleanup</span><br>
+            <span class="prompt">Nervous:</span> <span class="response">12 nerves - Gmail polling, Slack monitoring, AI triage</span><br>
+            <span class="prompt">Cerebral:</span> <span class="response">7 organs - revenue analysis, relationship radar, content planning</span><br>
+            <span class="prompt">Muscular:</span> <span class="response">(building next) - content pipelines, crew execution</span>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 20px; text-align: center; font-size: 1.05em; color: var(--text-mid);">
+          The magic happens when the layers <span style="color: var(--accent); font-weight: 600;">connect.</span>
+        </p>
+        <aside class="notes">
+          The magic happens when the layers connect. Here's a real example. A client email arrives at 2am. A cron job detects it. AI triages it using my Brain File, my pricing history, my relationship context with that client. By 7am, I have three draft responses waiting. I review, pick one, maybe tweak a sentence, and send. Total time: 2 minutes instead of 30.
+
+          My system runs 45+ jobs organized into what I call body systems. I'll show you those in detail on the next slides. But the point here is these aren't separate tools. They're connected layers. Automation feeds intelligence, intelligence prepares decisions for me.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 17: THE WEEKLY RHYTHM
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Buy Back Your Mind &mdash; Chapter 13</div>
+        <h2>The Weekly Rhythm</h2>
+        <h3 style="margin-bottom: 24px;">40 minutes/week. Compounding returns.</h3>
+        <div class="rhythm-timeline fragment fade-up" style="margin-top: 24px;">
+          <div class="rhythm-day" style="background: rgba(0,212,170,0.04); border-radius: 16px 0 0 16px;">
+            <div class="day-name">Monday</div>
+            <div class="day-action" style="color: var(--accent);">Calibrate</div>
+            <div class="day-time">15 min</div>
+            <div class="day-detail">
+              Rate energy 1-10.<br>
+              Name top obstacle.<br>
+              <em>"My energy is [X], my biggest challenge is [Y]"</em>
+            </div>
+          </div>
+          <div class="rhythm-arrow">&#10132;</div>
+          <div class="rhythm-day" style="background: rgba(0,153,255,0.04);">
+            <div class="day-name">Wednesday</div>
+            <div class="day-action" style="color: var(--accent2);">Check-in</div>
+            <div class="day-time">10 min</div>
+            <div class="day-detail">
+              What accomplished?<br>
+              What am I <em>avoiding</em>?<br>
+              What to reprioritize?
+            </div>
+          </div>
+          <div class="rhythm-arrow">&#10132;</div>
+          <div class="rhythm-day" style="background: rgba(240,192,64,0.04); border-radius: 0 16px 16px 0;">
+            <div class="day-name">Friday</div>
+            <div class="day-action" style="color: var(--accent-warm);">Learn</div>
+            <div class="day-time">15 min</div>
+            <div class="day-detail">
+              Update Brain File.<br>
+              Log wins &amp; failures.<br>
+              Ask AI: <em>"What pattern do you see?"</em>
+            </div>
+          </div>
+        </div>
+        <div class="fragment fade-up" style="margin-top: 32px; text-align: center;">
+          <p style="font-size: 1.15em; color: var(--text);">
+            Friday's output becomes Monday's opening context.
+          </p>
+          <p style="font-size: 1em; color: var(--text-dim); margin-top: 8px;">
+            Every week, your AI gets smarter. The loop never breaks.
+          </p>
+        </div>
+        <aside class="notes">
+          Chapter 13. The Weekly Rhythm. 40 minutes per week total. Three touchpoints.
+
+          Monday. Calibrate. 15 minutes. Rate your energy 1 to 10. Name your top obstacle. Tell your AI: "My energy this week is a 6. My biggest challenge is pipeline anxiety. I need you to focus on outreach." That simple prompt changes how your AI operates all week.
+
+          Wednesday. Check-in. 10 minutes. Three questions. What have I accomplished? What am I avoiding? What should I reprioritize? The "avoiding" question is the most important one. It surfaces the things you're procrastinating on.
+
+          Friday. Learn. 15 minutes. Update your Brain File. Log wins and failures. Ask your AI: what pattern do you see? The AI's Friday response becomes Monday's opening context. The loop compounds. Every week your AI knows you better.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 18: THE COMPOUNDING EFFECT
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>The Compounding Effect</h2>
+        <div class="fragment zoom-in" style="text-align: center; margin-top: 32px;">
+          <div style="display: flex; gap: 48px; justify-content: center; align-items: center;">
+            <div style="text-align: center;">
+              <div class="counter-number" data-counter="1" data-suffix="%" style="font-size: 4em;">0%</div>
+              <div class="counter-label">better per week</div>
+            </div>
+            <div style="font-size: 2em; color: var(--text-dim);">=</div>
+            <div style="text-align: center;">
+              <div class="counter-number" data-counter="67" data-suffix="%" style="font-size: 4em;">0%</div>
+              <div class="counter-label">better per year</div>
+            </div>
+          </div>
+        </div>
+        <div class="compound-timeline fragment fade-up">
+          <div class="compound-step">
+            <div class="week">WEEK 1</div>
+            <div class="label">Stranger</div>
+          </div>
+          <div class="compound-arrow">&#10132;</div>
+          <div class="compound-step">
+            <div class="week">WEEK 4</div>
+            <div class="label">Patterns</div>
+          </div>
+          <div class="compound-arrow">&#10132;</div>
+          <div class="compound-step">
+            <div class="week">WEEK 10</div>
+            <div class="label">Predictions</div>
+          </div>
+          <div class="compound-arrow">&#10132;</div>
+          <div class="compound-step final">
+            <div class="week">WEEK 50</div>
+            <div class="label">Partner</div>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 36px; text-align: center; font-size: 1.15em; color: var(--text); font-weight: 400; max-width: 700px; margin-left: auto; margin-right: auto;">
+          Week 10 is where it gets interesting. Your AI starts catching patterns <span style="color: var(--accent); font-weight: 700;">before you do.</span>
+        </p>
+        <aside class="notes">
+          The compounding effect is real. 1% better per week doesn't sound like much. But compounded over a year, that's 67% better.
+
+          Week 1, your AI is a stranger. Helpful but generic. Week 4, it starts recognizing your patterns. It knows your voice, your priorities. Week 10 is where it gets interesting. Your AI starts catching patterns before you do. It flags when you're overcommitting. Reminds you of decisions you made months ago. Notices when your energy drops on Wednesdays.
+
+          Week 50, you have a partner. An AI that knows you better than most humans do. Not because it's magical. Because you've been feeding it context systematically for a year.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 19: THE BODY SYSTEMS
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">PAI Architecture</div>
+        <h2>The Body Systems</h2>
+        <h3 style="margin-bottom: 20px;">Organizing 45+ autonomous jobs with a biological metaphor</h3>
+        <div class="node-graph fragment fade-up" style="margin-top: 16px;">
+          <div class="system-node sys-endocrine">
+            <div class="sys-header">
+              <div class="sys-icon">&#129505;</div>
+              <h4>Endocrine</h4>
+              <span class="sys-count">12 organs</span>
+            </div>
+            <div class="sys-role">Self-Maintenance</div>
+            <ul>
+              <li>Memory decay &amp; pruning</li>
+              <li>Credential health checks</li>
+              <li>Service heartbeat monitor</li>
+              <li>Vault cleanup &amp; rotation</li>
+            </ul>
+          </div>
+          <div class="system-node sys-nervous">
+            <div class="sys-header">
+              <div class="sys-icon">&#9889;</div>
+              <h4>Nervous</h4>
+              <span class="sys-count">12 nerves</span>
+            </div>
+            <div class="sys-role">Stimulus-Response</div>
+            <ul>
+              <li>Gmail &amp; Slack polling</li>
+              <li>AI triage &amp; urgency routing</li>
+              <li>Draft response generation</li>
+              <li>Calendar watcher</li>
+            </ul>
+          </div>
+          <div class="system-node sys-cerebral">
+            <div class="sys-header">
+              <div class="sys-icon">&#129504;</div>
+              <h4>Cerebral</h4>
+              <span class="sys-count">7 organs</span>
+            </div>
+            <div class="sys-role">Strategic Analysis</div>
+            <ul>
+              <li>Revenue analyst</li>
+              <li>Relationship radar</li>
+              <li>Time strategist</li>
+              <li>Content compass</li>
+            </ul>
+          </div>
+          <div class="system-node sys-muscular">
+            <div class="sys-header">
+              <div class="sys-icon">&#128170;</div>
+              <h4>Muscular</h4>
+              <span class="sys-count">next</span>
+            </div>
+            <div class="sys-role">Output Production</div>
+            <ul>
+              <li>Content pipelines</li>
+              <li>Crew execution</li>
+              <li>Client deliverables</li>
+              <li>Business automation</li>
+            </ul>
+          </div>
+        </div>
+        <aside class="notes">
+          This is what it looks like when you take the Operating System model to its logical conclusion. I organize all my autonomous jobs using a biological body systems metaphor. Four systems, each with a clear purpose and boundary.
+
+          Endocrine is self-maintenance. 12 organs that keep the system healthy. Memory decay prevents old context from poisoning decisions. Credential health checks API keys weekly. Vault cleanup rotates old files.
+
+          Nervous is stimulus-response. 12 nerves that sense external input. Gmail polling every 5 minutes. Slack monitoring. AI triage classifies urgency. Draft responses generated in my voice.
+
+          Cerebral is strategic analysis. 7 organs that think about the big picture. Revenue analysis. Relationship radar finds contacts going cold. Time strategist audits my calendar. Content compass identifies topic gaps.
+
+          Muscular is output production. This is the one I'm building next. Content pipelines, crew execution, client deliverables. The system that does the actual work.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 20: BODY SYSTEMS DETAIL
+           ============================================================ -->
+      <section data-transition="slide">
+        <h2>How Organs Behave</h2>
+        <h3 style="margin-bottom: 20px;">Each organ has a clear boundary, schedule, and output channel</h3>
+        <div class="grid-2" style="margin-top: 16px; gap: 24px;">
+          <div class="fragment fade-up" style="text-align: left;">
+            <div class="mock-terminal" style="font-size: 0.75em;">
+              <span class="comment">// Cerebral Organ: Revenue Analyst</span><br>
+              <span class="prompt">Schedule:</span> <span class="response">Monday 6:30am</span><br>
+              <span class="prompt">Input:</span> <span class="response">Vault financials, pipeline data, client invoices</span><br>
+              <span class="prompt">Engine:</span> <span class="response">claude -p --model sonnet (via temp file)</span><br>
+              <span class="prompt">Output:</span> <span class="response">~/vault/cerebral-reports/revenue-*.md</span><br>
+              <span class="prompt">Channel:</span> <span class="response">#jax-cerebral (Slack)</span><br><br>
+              <span class="comment">// Cerebral Organ: Relationship Radar</span><br>
+              <span class="prompt">Schedule:</span> <span class="response">Monday 7:00am</span><br>
+              <span class="prompt">Input:</span> <span class="response">Contact profiles, last-touch dates, meeting history</span><br>
+              <span class="prompt">Engine:</span> <span class="response">claude -p --model sonnet</span><br>
+              <span class="prompt">Output:</span> <span class="response">Contacts going cold, nurture suggestions</span><br>
+              <span class="prompt">Channel:</span> <span class="response">#jax-cerebral</span>
+            </div>
+          </div>
+          <div class="fragment fade-up" style="text-align: left;">
+            <p style="font-size: 1.05em; color: var(--text); font-weight: 700; margin-bottom: 16px;">Boundary Rules</p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,107,157,0.06); border-radius: 10px; border-left: 3px solid #ff6b9d;">
+                <span style="font-weight: 700; color: #ff6b9d; min-width: 90px;">Endocrine</span>
+                <span style="color: var(--text-mid); font-size: 0.9em;">Keeps the system healthy</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,217,61,0.06); border-radius: 10px; border-left: 3px solid #ffd93d;">
+                <span style="font-weight: 700; color: #ffd93d; min-width: 90px;">Nervous</span>
+                <span style="color: var(--text-mid); font-size: 0.9em;">Senses external input and responds</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(108,92,231,0.06); border-radius: 10px; border-left: 3px solid #6c5ce7;">
+                <span style="font-weight: 700; color: #6c5ce7; min-width: 90px;">Cerebral</span>
+                <span style="color: var(--text-mid); font-size: 0.9em;">Thinks strategically, recommends</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(0,212,170,0.06); border-radius: 10px; border-left: 3px solid var(--accent);">
+                <span style="font-weight: 700; color: var(--accent); min-width: 90px;">Muscular</span>
+                <span style="color: var(--text-mid); font-size: 0.9em;">Produces output for Chase or clients</span>
+              </div>
+            </div>
+            <p style="margin-top: 16px; font-size: 0.95em; color: var(--text-dim);">
+              The boundary rule prevents scope creep.<br>
+              Each system knows what it is <em>and what it isn't.</em>
+            </p>
+          </div>
+        </div>
+        <aside class="notes">
+          Let me show you how these organs actually behave. Each one has a clear schedule, input source, processing engine, output destination, and communication channel.
+
+          The Revenue Analyst runs Monday at 6:30am. It reads my vault financials, pipeline data, and client invoices. It runs through Claude Sonnet. The report lands in my vault and posts to the jax-cerebral Slack channel. By the time I open my laptop Monday morning, I have a revenue analysis waiting.
+
+          Relationship Radar runs Monday at 7. It scans my contact profiles, checks last-touch dates, flags anyone going cold, and suggests who to reach out to.
+
+          The boundary rules are critical. Endocrine keeps the system healthy but never sends output to me. Nervous senses and responds but doesn't analyze. Cerebral thinks and recommends but doesn't act. Muscular produces. Each system knows what it is and what it isn't. That prevents scope creep.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 21: THREE THINGS THIS WEEK
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Start Here</div>
+        <h2>Three Things <span class="gradient-text">This Week</span></h2>
+        <div style="margin-top: 36px; max-width: 700px; margin-left: auto; margin-right: auto;">
+          <div class="challenge-card fragment fade-up" style="margin-bottom: 16px;">
+            <div class="num">1</div>
+            <div>
+              <p><strong style="color: var(--text); font-size: 1.1em;">Write your Brain File</strong> <span style="color: var(--text-dim);">(30 min)</span></p>
+              <p style="color: var(--text-mid); margin-top: 4px;">Five sections. Paste into your AI. Ask it to draft an email. Compare.</p>
+            </div>
+          </div>
+          <div class="challenge-card fragment fade-up" style="margin-bottom: 16px;">
+            <div class="num">2</div>
+            <div>
+              <p><strong style="color: var(--text); font-size: 1.1em;">Block Mon-Wed-Fri</strong> <span style="color: var(--text-dim);">(5 min)</span></p>
+              <p style="color: var(--text-mid); margin-top: 4px;">Three calendar slots. 40 minutes total per week. Start the rhythm.</p>
+            </div>
+          </div>
+          <div class="challenge-card fragment fade-up" style="margin-bottom: 16px;">
+            <div class="num">3</div>
+            <div>
+              <p><strong style="color: var(--text); font-size: 1.1em;">Add one guardrail</strong> <span style="color: var(--text-dim);">(15 min)</span></p>
+              <p style="color: var(--text-mid); margin-top: 4px;">Pick one: review before sending externally, track daily AI spend, or log sessions.</p>
+            </div>
+          </div>
+        </div>
+        <p class="fragment fade-up" style="margin-top: 32px; text-align: center; font-size: 1.2em; color: var(--text); font-weight: 400;">
+          If you do nothing else: <span style="color: var(--accent); font-weight: 700;">write the Brain File.</span><br>
+          <span style="font-size: 0.9em; color: var(--text-mid);">That single document changes everything.</span>
+        </p>
+        <aside class="notes">
+          Three things you can do this week.
+
+          One, write your Brain File. 30 minutes. Five sections. Paste it into your AI and test it. If the output doesn't sound like you, iterate on the voice section.
+
+          Two, block three calendar slots. Monday calibrate. Wednesday check-in. Friday learn. 40 minutes total per week. Start the rhythm.
+
+          Three, add one guardrail. Just one. Review external comms before sending. Track your daily AI spend. Or start logging sessions. Pick the easiest one and do it.
+
+          If you only do one thing, write the Brain File. That single document changes everything about how your AI performs.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 22: LET'S CONNECT
+           ============================================================ -->
+      <section data-transition="zoom" data-background-gradient="radial-gradient(ellipse at center, #0e1e38, #0a1628)">
+        <h2 style="font-size: 2.4em;">Let's <span class="gradient-text">Connect</span></h2>
+        <div class="accent-line"></div>
+        <div style="display: flex; gap: 64px; justify-content: center; align-items: start; margin-top: 44px; flex-wrap: wrap;">
+          <div style="text-align: center;">
+            <div style="width: 180px; height: 180px; background: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 0 40px rgba(0,212,170,0.15);">
+              <img src="images/qr-code.png" alt="QR code for Chase Aldridge LinkedIn profile" width="160" height="160" style="border-radius: 8px;">
+            </div>
+            <p style="font-size: 0.95em; color: var(--text-dim); font-family: var(--mono);">scan to connect on LinkedIn</p>
+          </div>
+          <div style="text-align: left;">
+            <div class="connect-link"><span class="dot"></span><a href="https://chasealdridge.com">chasealdridge.com</a></div>
+            <div class="connect-link"><span class="dot"></span><a href="https://linkedin.com/in/chase-aldridge">linkedin.com/in/chase-aldridge</a></div>
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <p style="font-size: 1.1em; color: var(--text); font-weight: 600; margin-bottom: 8px;">&#128218; Buy Back Your Mind</p>
+              <p style="font-size: 0.9em; color: var(--text-dim);">
+                How AI Can Free Your Time, Focus,<br>and Mental Energy
+              </p>
+              <p style="font-size: 0.85em; color: var(--accent); margin-top: 8px; font-family: var(--mono);">Coming soon</p>
+            </div>
+          </div>
+        </div>
+        <p style="margin-top: 40px; font-size: 1.15em; color: var(--text-mid); font-weight: 300; font-style: italic;">
+          "The future belongs to people who teach AI their voice<br>
+          <span style="color: var(--accent); font-weight: 600;">and give it guardrails.</span>"
+        </p>
+        <aside class="notes">
+          That's it. My website is chasealdridge.com. I write about this stuff. The QR code goes straight to my LinkedIn. Connect with me there.
+
+          The book, Buy Back Your Mind, is in progress. Everything I shared today from Chapters 11, 12, and 13 will be in there with more depth, exercises, and case studies.
+
+          If you're in Denver or Boulder and want to grab coffee and talk through how this applies to your situation, reach out. Thanks for your time. Happy to take questions.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 23: BONUS - RESOURCES
+           ============================================================ -->
+      <section data-transition="slide">
+        <div class="slide-label">Bonus</div>
+        <h2>Resources & Tools</h2>
+        <div class="grid-2" style="margin-top: 32px; gap: 40px; align-items: start;">
+          <div style="text-align: left;">
+            <p style="font-size: 1.1em; color: var(--text); font-weight: 700; margin-bottom: 16px;">Recommended Starting Stack</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="challenge-card">
+                <div class="num" style="background: var(--accent);">1</div>
+                <p><strong style="color: var(--text);">Claude Code</strong> &mdash; AI that can read, write, and execute</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num" style="background: var(--accent2);">2</div>
+                <p><strong style="color: var(--text);">Obsidian Vault</strong> &mdash; Your knowledge base (Brain File lives here)</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num" style="background: #6c5ce7;">3</div>
+                <p><strong style="color: var(--text);">Single .env</strong> &mdash; One file for all credentials. Never committed.</p>
+              </div>
+              <div class="challenge-card">
+                <div class="num" style="background: var(--accent-warm); color: var(--bg);">4</div>
+                <p><strong style="color: var(--text);">Cron / Cronicle</strong> &mdash; Schedule your autonomous jobs</p>
+              </div>
+            </div>
+          </div>
+          <div style="text-align: left;">
+            <p style="font-size: 1.1em; color: var(--text); font-weight: 700; margin-bottom: 16px;">Book Frameworks Referenced</p>
+            <ul style="list-style: none; padding: 0;">
+              <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-mid); font-size: 0.95em;">
+                <span style="color: var(--accent); font-weight: 600;">Ch 11</span> &mdash; The Context Stack (Identity > Business > Behavioral > Historical)
+              </li>
+              <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-mid); font-size: 0.95em;">
+                <span style="color: var(--accent); font-weight: 600;">Ch 12</span> &mdash; The Operating System Model (Hands / Brain / Soul)
+              </li>
+              <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-mid); font-size: 0.95em;">
+                <span style="color: var(--accent); font-weight: 600;">Ch 13</span> &mdash; The Weekly Calibration Cycle (Mon / Wed / Fri)
+              </li>
+              <li style="padding: 8px 0; color: var(--text-mid); font-size: 0.95em;">
+                <span style="color: var(--accent); font-weight: 600;">PAI</span> &mdash; Body Systems Architecture (Endocrine / Nervous / Cerebral / Muscular)
+              </li>
+            </ul>
+          </div>
+        </div>
+        <aside class="notes">
+          Bonus slide with resources. If you want to start building this yourself, here's the stack I recommend. Claude Code as your AI engine. Obsidian for your knowledge base and Brain File. A single .env file for all your credentials. And Cronicle or cron for scheduling autonomous jobs.
+
+          The book frameworks I covered today: Context Stack from Chapter 11, Operating System Model from Chapter 12, Weekly Calibration Cycle from Chapter 13, and the Body Systems Architecture for organizing it all.
+        </aside>
+      </section>
+
+      <!-- ============================================================
+           SLIDE 24: BONUS - Q&A
+           ============================================================ -->
+      <section data-transition="zoom" data-background-gradient="radial-gradient(ellipse at center, #0e1e38, #0a1628)">
+        <div style="min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <h1 style="font-size: 4em;">
+            <span class="gradient-text">Questions?</span>
+          </h1>
+          <div class="accent-line"></div>
+          <p style="font-size: 1.2em; color: var(--text-mid); font-weight: 300; margin-top: 16px;">
+            Chase Aldridge &middot; chasealdridge.com
+          </p>
+        </div>
+        <aside class="notes">
+          Q&A time. Common questions:
+
+          "How much does this cost?" About $200/month for the full stack. Claude Code subscription, a few API costs, Cronicle is free and self-hosted.
+
+          "Can I do this without coding?" Yes, start with the Brain File. That's just a text document. The automation and body systems come later.
+
+          "How long until I see results?" Write the Brain File today, you'll see better output immediately. The compounding effect takes about 4-6 weeks to really feel.
+
+          "What about privacy?" Everything runs locally or on your own infrastructure. Your Brain File never leaves your system unless you choose to share it.
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script>
+    // =========================================================
+    // BLUEPRINT GRID BACKGROUND
+    // =========================================================
+    (function() {
+      const canvas = document.getElementById('grid-canvas');
+      const ctx = canvas.getContext('2d');
+      let time = 0;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const gridSize = 60;
+        const pulseSpeed = 0.002;
+        time += pulseSpeed;
+
+        // Draw grid lines
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          const distFromCenter = Math.abs(x - canvas.width / 2) / canvas.width;
+          const alpha = (0.04 + Math.sin(time + x * 0.01) * 0.02) * (1 - distFromCenter * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.strokeStyle = `rgba(0, 212, 170, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          const distFromCenter = Math.abs(y - canvas.height / 2) / canvas.height;
+          const alpha = (0.04 + Math.sin(time + y * 0.01) * 0.02) * (1 - distFromCenter * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.strokeStyle = `rgba(0, 212, 170, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+
+        // Draw intersection dots
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          for (let y = 0; y < canvas.height; y += gridSize) {
+            const distFromCenter = Math.sqrt(
+              Math.pow((x - canvas.width / 2) / canvas.width, 2) +
+              Math.pow((y - canvas.height / 2) / canvas.height, 2)
+            );
+            const pulse = Math.sin(time * 2 + x * 0.02 + y * 0.02);
+            const alpha = (0.08 + pulse * 0.04) * (1 - distFromCenter);
+            if (alpha > 0) {
+              ctx.beginPath();
+              ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(0, 212, 170, ${alpha})`;
+              ctx.fill();
+            }
+          }
+        }
+
+        requestAnimationFrame(drawGrid);
+      }
+      drawGrid();
+    })();
+
+    // =========================================================
+    // ANIMATED COUNTERS
+    // =========================================================
+    function animateCounters(slide) {
+      const counters = slide.querySelectorAll('[data-counter]');
+      counters.forEach(el => {
+        if (el.dataset.animated) return;
+        el.dataset.animated = 'true';
+
+        const target = parseFloat(el.dataset.counter);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const duration = 1500;
+        const start = performance.now();
+        const isFloat = target % 1 !== 0;
+
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = target * eased;
+          el.textContent = prefix + (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // =========================================================
+    // CARD ENTRANCE OBSERVER
+    // =========================================================
+    function triggerCardEntrances(slide) {
+      const cards = slide.querySelectorAll('.card-enter');
+      cards.forEach((card, i) => {
+        setTimeout(() => card.classList.add('visible'), i * 150);
+      });
+    }
+
+    // =========================================================
+    // INITIALIZE REVEAL.JS
+    // =========================================================
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      backgroundTransition: 'zoom',
+      center: true,
+      width: 1920,
+      height: 1080,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+      plugins: [RevealNotes],
+      autoAnimateEasing: 'ease-out',
+      autoAnimateDuration: 0.8,
+    });
+
+    Reveal.on('slidechanged', (event) => {
+      animateCounters(event.currentSlide);
+      triggerCardEntrances(event.currentSlide);
+    });
+
+    Reveal.on('fragmentshown', (event) => {
+      const slide = event.fragment.closest('section');
+      animateCounters(slide);
+      if (event.fragment.classList.contains('card-enter')) {
+        event.fragment.classList.add('visible');
+      }
+    });
+
+    animateCounters(Reveal.getCurrentSlide());
+  </script>
+</body>
+</html>
