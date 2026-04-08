@@ -720,7 +720,7 @@
         <p style="font-size: 1.15em; color: var(--text); margin-top: 28px; font-weight: 600;">Chase Aldridge</p>
         <p style="font-size: 0.9em; color: var(--text-dim); margin-top: 8px; font-family: var(--mono);">April 8, 2026</p>
         <aside class="notes">
-          Alright, let's get into it. I've been building governance and guardrails into my AI systems for the last year and I wanted to pull apart how it actually works. Not theory, not policy documents. Running code that keeps AI from going off the rails. Two parts today. First, the governance framework. Then, material from a book I'm writing called Buy Back Your Mind, covering how to build AI that actually thinks like you.
+          Alright, let's get into it. I've been building governance and guardrails into my AI systems for the last year and I wanted to pull apart how it actually works. Two layers. First is the automated layer -- hooks and checks that fire every time your AI does anything. Second is the human layer -- risk classification, proportional documentation, and the sign-off processes that protect you when something goes wrong. Both layers matter. Then in Part 2, material from a book I'm writing called Buy Back Your Mind, covering how to build AI that actually thinks like you.
         </aside>
       </section>
 
@@ -767,7 +767,7 @@
           </div>
         </div>
         <aside class="notes">
-          Two parts. Part 1 is the governance stuff -- how I've actually addressed guardrails and compliance. Not abstract frameworks. Real hooks and checks that fire every time my AI does anything, at both personal and enterprise scale. Part 2 goes into the book material. How to build AI that actually knows you. The context stack, the operating system model, the weekly rhythm. Let's start with governance.
+          Two parts. Part 1 is governance. Two layers to it. The automated layer -- hooks, trust classification, budget enforcement, the stuff that fires without you thinking about it. And the human layer -- how you classify AI systems by risk, how you scale your documentation to match that risk, who signs off before something goes live, and what your audit trail looks like when a regulator comes knocking. Both layers, personal scale and enterprise scale. Part 2 goes into the book material. How to build AI that actually knows you. The context stack, the operating system model, the weekly rhythm. Let's start with governance.
         </aside>
       </section>
 
@@ -843,6 +843,8 @@
           Pre-Deploy Validation runs a checklist before any deployment. TypeScript compiles? Env vars set? Git clean? This catches the stupid mistakes before they hit production.
 
           At enterprise scale, this same concept becomes a formal pre-launch checklist. I built one where the system literally will not go live until three people sign off: the engineer who built it, the compliance officer who reviewed the risk documentation, and the head of IT who verified infrastructure security. No single person can bypass it. And the documentation requirements scale with risk. I built a four-tier risk classification: Tier 1 is minimal risk, internal only, needs 3 documents. Tier 2 involves personal data, needs 6 to 8. Tier 3 -- employment context or children's data -- needs 11 to 12 documents. Tier 4, high-risk under the EU AI Act, needs all 12. The system routes you to the right paperwork automatically based on a decision tree.
+
+          The key idea is proportionality. You wouldn't write an 11-document compliance package for an internal FAQ bot. But if your AI touches employment decisions or children's data, you absolutely should. A Tier 1 system needs an infrastructure security assessment, a pre-launch checklist, and you're done. A Tier 3 system needs a full DPIA, an EU AI Act classification rationale, a bias monitoring plan, a human oversight protocol, a transparency and disclosure plan, and a vendor assessment on top of that. That's not bureaucracy. That's your legal defense if something goes wrong.
 
           The key insight is these don't block. They inject context. The AI still makes the decision, but it makes a better decision because it has more information.
         </aside>
@@ -992,7 +994,9 @@
 
           I formalized this into four safety levels for the enterprise framework. TSL-1, Assistive: the AI provides information to staff only, no impact on end users. TSL-2, Gatekeeping: the AI makes pass/fail decisions on content -- like whether a photo meets submission guidelines -- but the person can retry easily. TSL-3, Evaluative: the AI scores or ranks people, which is where things get serious. TSL-4, Determinative: the AI makes decisions that directly affect someone's opportunities. Each level has proportional governance requirements. A TSL-1 chatbot needs maybe 3 compliance documents. A TSL-3 ranking system needs all 12.
 
-          But there are certain things that never go fully autonomous. External communications. Deployments. Anything that touches money. Those always have a human checkpoint. Not because the AI is bad at them. But because the cost of a mistake is too high. When you're dealing with minors' data, the compliance bar gets even higher. I built a children's data DPIA that specifies three rights: guardians can see the AI's full decision history on their child's profile, they can request human review of any automated decision, and they can opt out of AI processing entirely for a manual-only workflow. That dial stays locked.
+          But human-in-the-loop isn't just about automated permission gates. It's also about the human practices you build around AI. Who reviews the AI's outputs on a regular schedule? Who owns the bias monitoring reports? Who has the authority to override or shut down the system? In the enterprise framework, I defined a RACI matrix for every compliance activity. The engineer is responsible for building the technical docs. The compliance officer is accountable for reviewing and approving them. IT is responsible for infrastructure security and vendor assessments. And no one person can approve a go-live -- that requires all three. These aren't automated hooks. They're human governance practices that you define once and enforce through process.
+
+          There are also certain things that never go fully autonomous. External communications. Deployments. Anything that touches money. Those always have a human checkpoint. Not because the AI is bad at them. But because the cost of a mistake is too high. When you're dealing with minors' data, the compliance bar gets even higher. I built a children's data DPIA that specifies three rights: guardians can see the AI's full decision history on their child's profile, they can request human review of any automated decision, and they can opt out of AI processing entirely for a manual-only workflow. That dial stays locked.
         </aside>
       </section>
 
@@ -1071,9 +1075,9 @@
 
           Third, trust is earned. Start with tight permissions. Loosen them over time as the AI proves it can handle more autonomy. Permission modes are the dial you turn.
 
-          These principles apply at any scale. Solo practitioner, small team, enterprise. The mechanics change, the principles don't.
+          And here's a fourth one that applies whether you're solo or enterprise: document proportionally to risk. If the AI writes internal summaries for your own use, minimal documentation is fine. If the AI sends emails to clients, document what it can and can't send, and who reviews it. If the AI makes decisions that affect real people -- hiring, content moderation, financial recommendations -- build the full package: classification rationale, impact assessment, bias monitoring, human oversight protocol, audit trail. Match your governance effort to the actual harm that could result if the AI gets it wrong. That's the principle behind the enterprise framework I built -- proportionality. Higher stakes, more documentation. Lower stakes, less. But never zero.
 
-          I took the same governance I showed you today and scaled it into a 17-document compliance framework for a company facing the EU AI Act deadline in August 2026. Three governance policies that get reviewed annually. Two assessment tools -- an intake form and a risk classification decision tree. And 12 compliance templates that route automatically based on risk tier. The framework covers everything from DPIA and fundamental rights assessments to vendor governance and ongoing monitoring specifications. The key design principle was proportionality -- a low-risk internal chatbot doesn't need the same paperwork as a system that processes children's photos. The risk tier determines exactly which documents are required, which are recommended, and which don't apply. That's how you make governance scalable instead of bureaucratic.
+          These principles apply at any scale. Solo practitioner, small team, enterprise. I took the same governance and scaled it into a 17-document compliance framework for a company facing the EU AI Act deadline in August 2026. Three governance policies reviewed annually. Two assessment tools for intake and risk classification. And 12 compliance templates that route automatically based on risk tier -- from DPIA and fundamental rights assessments to vendor governance and ongoing monitoring. The risk tier determines exactly which documents are required, which are recommended, and which don't apply. That's how you make governance scalable instead of bureaucratic.
         </aside>
       </section>
 
